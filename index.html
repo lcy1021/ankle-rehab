@@ -1,0 +1,1660 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>踝关节康复</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2563EB">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="康复计划">
+<link rel="apple-touch-icon" href="icon.svg">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --blue: #2563EB;
+    --blue-dark: #1D4ED8;
+    --blue-light: #EFF6FF;
+    --blue-mid: #BFDBFE;
+    --green: #16A34A;
+    --green-light: #DCFCE7;
+    --green-mid: #86EFAC;
+    --red: #DC2626;
+    --red-light: #FEE2E2;
+    --yellow: #D97706;
+    --yellow-light: #FEF3C7;
+    --bg: #F1F5F9;
+    --card: #FFFFFF;
+    --text: #0F172A;
+    --text-sub: #64748B;
+    --text-light: #94A3B8;
+    --border: #E2E8F0;
+    --nav-h: 68px;
+    --header-h: 60px;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    height: var(--header-h);
+    background: var(--card);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-logo {
+    width: 34px; height: 34px;
+    background: var(--blue);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+  }
+  .header-logo svg { width: 20px; height: 20px; fill: white; }
+  .header-title { font-size: 17px; font-weight: 700; color: var(--blue); flex: 1; }
+  .header-bell {
+    width: 38px; height: 38px;
+    background: var(--bg);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+  .header-bell svg { width: 20px; height: 20px; fill: var(--text-sub); }
+
+  /* ── PAGES ── */
+  .page { display: none; min-height: calc(100vh - var(--header-h) - var(--nav-h)); padding-bottom: calc(var(--nav-h) + 16px); }
+  .page.active { display: block; animation: fadeUp .22s ease; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+  /* ── NAV ── */
+  .nav {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 430px; height: var(--nav-h);
+    background: var(--card); border-top: 1px solid var(--border);
+    display: flex; z-index: 100;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer; padding-top: 8px; position: relative; }
+  .nav-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+  .nav-icon svg { width: 22px; height: 22px; fill: var(--text-light); transition: fill .2s; }
+  .nav-label { font-size: 10px; font-weight: 600; color: var(--text-light); transition: color .2s; letter-spacing: 0.4px; }
+  .nav-item.active .nav-icon svg { fill: var(--blue); }
+  .nav-item.active .nav-label { color: var(--blue); }
+  .nav-item.active::after { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 32px; height: 3px; background: var(--blue); border-radius: 0 0 3px 3px; }
+
+  /* ── CARDS ── */
+  .card { background: var(--card); border-radius: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .section-label { font-size: 12px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.8px; padding: 18px 20px 10px; }
+
+  /* ── BADGES ── */
+  .badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+  .badge-green { background: var(--green-light); color: var(--green); }
+  .badge-blue { background: var(--blue-light); color: var(--blue); }
+  .badge-yellow { background: var(--yellow-light); color: var(--yellow); }
+  .badge-red { background: var(--red-light); color: var(--red); }
+  .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+  /* ── BUTTONS ── */
+  .btn-primary { width: 100%; background: var(--blue); color: white; border: none; border-radius: 14px; padding: 16px; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background .15s, transform .1s; }
+  .btn-primary:active { background: var(--blue-dark); transform: scale(0.98); }
+  .btn-primary svg { width: 18px; height: 18px; fill: white; }
+  .btn-text { background: none; border: none; font-size: 13px; font-weight: 600; color: var(--text-sub); cursor: pointer; padding: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* ── SLIDER ── */
+  .slider-container { padding: 0 2px; }
+  input[type=range] { width: 100%; -webkit-appearance: none; height: 6px; border-radius: 3px; background: var(--border); outline: none; cursor: pointer; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 24px; height: 24px; border-radius: 50%; background: var(--blue); box-shadow: 0 2px 8px rgba(37,99,235,0.4); cursor: pointer; }
+  .pain-slider input[type=range]::-webkit-slider-thumb { background: var(--red); box-shadow: 0 2px 8px rgba(220,38,38,0.4); }
+
+  /* ── WARNING ── */
+  .warning-banner { background: var(--red-light); border: 1px solid #FECACA; border-radius: 12px; padding: 12px 14px; display: flex; align-items: flex-start; gap: 10px; }
+  .warning-banner svg { width: 18px; height: 18px; fill: var(--red); flex-shrink: 0; margin-top: 1px; }
+  .warning-banner p { font-size: 13px; color: var(--red); font-weight: 500; line-height: 1.5; }
+
+  /* ── STEP ITEM ── */
+  .step-item { display: flex; gap: 14px; padding: 14px 20px; border-bottom: 1px solid var(--border); align-items: flex-start; }
+  .step-item:last-child { border-bottom: none; }
+  .step-num { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+  .step-num.active { background: var(--blue); color: white; }
+  .step-num.pending { background: var(--border); color: var(--text-sub); }
+  .step-content { flex: 1; }
+  .step-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .step-desc { font-size: 13px; color: var(--text-sub); line-height: 1.5; }
+  .step-item.pending-step .step-title { color: var(--text-sub); }
+  .step-item.pending-step .step-desc { color: var(--text-light); font-style: italic; }
+
+  /* ── EXERCISE LIST ── */
+  .ex-item { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background .1s; }
+  .ex-item:last-child { border-bottom: none; }
+  .ex-item:active { background: var(--bg); }
+  .ex-icon { width: 46px; height: 46px; border-radius: 12px; background: var(--blue-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 22px; }
+  .ex-info { flex: 1; }
+  .ex-name { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
+  .ex-meta { font-size: 12px; color: var(--text-sub); }
+  .ex-check { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .2s; }
+  .ex-check.checked { background: var(--green); border-color: var(--green); }
+  .ex-check.checked svg { display: block; }
+  .ex-check svg { display: none; width: 14px; height: 14px; fill: white; }
+
+  /* ── CALENDAR ── */
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; padding: 0 16px 16px; }
+  .cal-day-label { text-align: center; font-size: 11px; font-weight: 700; color: var(--text-sub); padding: 10px 0 6px; letter-spacing: 0.3px; }
+  .cal-day {
+    aspect-ratio: 1; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    transition: transform .1s, box-shadow .1s;
+    position: relative;
+  }
+  .cal-day:active { transform: scale(0.9); }
+  .cal-day.empty { opacity: 0; pointer-events: none; }
+  .cal-day.no-data { color: var(--text-light); }
+  .cal-day.future { color: #C8D0DC; pointer-events: none; }
+  .cal-day.pain-low { background: var(--green-light); color: var(--green); font-weight: 700; }
+  .cal-day.pain-mid { background: var(--yellow-light); color: var(--yellow); font-weight: 700; }
+  .cal-day.pain-high { background: var(--red-light); color: var(--red); font-weight: 700; }
+  .cal-day.today { background: var(--blue); color: white; font-weight: 800; box-shadow: 0 4px 12px rgba(37,99,235,0.35); }
+  .cal-day.selected:not(.today) { box-shadow: 0 0 0 2.5px var(--blue); }
+  /* Checkmark badge on days with entries */
+  .cal-day.has-entry::after {
+    content: '✓';
+    position: absolute; top: 1px; right: 3px;
+    font-size: 8px; font-weight: 800;
+    color: var(--green); line-height: 1;
+  }
+  .cal-day.pain-high.has-entry::after { color: var(--red); content: '!'; }
+  .cal-day.today.has-entry::after { color: rgba(255,255,255,0.9); }
+
+  /* ── STATS ── */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 16px 4px; }
+  .stat-card { background: var(--card); border-radius: 14px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .stat-num { font-size: 28px; font-weight: 800; }
+  .stat-lbl { font-size: 12px; color: var(--text-sub); margin-top: 2px; font-weight: 500; }
+  .stat-trend { font-size: 12px; font-weight: 600; margin-top: 6px; }
+
+  /* ── PHASE ── */
+  .phase-item { display: flex; align-items: center; gap: 12px; padding: 10px 20px; }
+  .phase-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .phase-bar-wrap { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .phase-bar { height: 100%; border-radius: 3px; transition: width .6s ease; }
+
+  /* ── VIDEO ── */
+  .video-area { width: 100%; height: 220px; background: linear-gradient(180deg, #CBD5E1 0%, #94A3B8 100%); display: flex; align-items: center; justify-content: center; }
+  .video-play { width: 60px; height: 60px; background: rgba(255,255,255,0.85); border-radius: 50%; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  .video-play svg { width: 28px; height: 28px; fill: var(--text); margin-left: 4px; }
+
+  /* ── HERO ── */
+  .hero-banner { background: linear-gradient(135deg, #1D4ED8 0%, #2563EB 60%, #3B82F6 100%); margin: 16px; border-radius: 20px; padding: 22px; color: white; position: relative; overflow: hidden; }
+  .hero-banner::after { content: ''; position: absolute; top: -30px; right: -30px; width: 120px; height: 120px; background: rgba(255,255,255,0.1); border-radius: 50%; pointer-events: none; }
+  .hero-day { font-size: 13px; font-weight: 600; opacity: 0.85; margin-bottom: 4px; }
+  .hero-title { font-size: 24px; font-weight: 800; margin-bottom: 6px; line-height: 1.2; }
+  .hero-subtitle { font-size: 13px; opacity: 0.82; }
+  .hero-phase { display: inline-flex; align-items: center; background: rgba(255,255,255,0.2); border-radius: 20px; padding: 5px 12px; margin-top: 14px; font-size: 12px; font-weight: 700; }
+
+  /* ── SCORE CARD ── */
+  .score-card { margin: 0 16px; border-radius: 16px; overflow: hidden; }
+  .score-row { padding: 18px 20px 14px; border-bottom: 1px solid var(--border); }
+  .score-row:last-child { border-bottom: none; }
+  .score-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .score-title { font-size: 15px; font-weight: 700; }
+  .score-value-box { font-size: 22px; font-weight: 800; min-width: 40px; text-align: right; }
+  .score-markers { display: flex; justify-content: space-between; padding: 0 2px; margin-top: 8px; }
+  .score-markers span { font-size: 11px; color: var(--text-light); }
+
+  /* ── CHECKED BANNER ── */
+  .checked-banner { margin: 0 16px; background: var(--green-light); border: 1px solid var(--green-mid); border-radius: 16px; padding: 18px 20px; display: flex; align-items: center; gap: 14px; }
+  .checked-banner svg { width: 32px; height: 32px; fill: var(--green); flex-shrink: 0; }
+  .checked-banner h4 { font-size: 16px; font-weight: 700; color: var(--green); }
+  .checked-banner p { font-size: 13px; color: #15803D; margin-top: 2px; }
+
+  /* ── ASSESSMENT PAGE ── */
+  #page-home { background: white; }
+  .assess-header { padding: 28px 24px 20px; }
+  .assess-label { font-size: 11px; font-weight: 700; color: var(--text-sub); letter-spacing: 1.2px; text-transform: uppercase; margin-bottom: 12px; }
+  .assess-title { font-size: 30px; font-weight: 800; color: var(--text); line-height: 1.15; margin-bottom: 12px; }
+  .assess-subtitle { font-size: 14px; color: var(--text-sub); line-height: 1.6; }
+
+  .pain-card { margin: 0 16px 14px; background: #F8FAFC; border-radius: 20px; padding: 20px; }
+  .pain-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+  .pain-card-title { font-size: 16px; font-weight: 700; }
+  .pain-current-pill { background: var(--blue-light); color: var(--blue); font-size: 13px; font-weight: 700; padding: 5px 12px; border-radius: 20px; }
+  .pain-card input[type=range] { width: 100%; -webkit-appearance: none; height: 5px; border-radius: 3px; background: linear-gradient(to right, var(--blue) var(--pct,50%), var(--border) var(--pct,50%)); outline: none; cursor: pointer; }
+  .pain-card input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 26px; height: 26px; border-radius: 50%; background: var(--blue); box-shadow: 0 2px 10px rgba(37,99,235,0.45); cursor: pointer; border: 3px solid white; }
+  .pain-markers { display: flex; justify-content: space-between; margin-top: 10px; }
+  .pain-markers span { font-size: 10px; font-weight: 600; color: var(--text-light); letter-spacing: 0.5px; text-transform: uppercase; }
+
+  .toggle-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0 16px 14px; }
+  .toggle-card { background: #F8FAFC; border-radius: 20px; padding: 18px; }
+  .toggle-icon { width: 40px; height: 40px; background: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  .toggle-icon svg { width: 22px; height: 22px; }
+  .toggle-name { font-size: 16px; font-weight: 700; margin-bottom: 12px; }
+  .toggle-row-inner { display: flex; align-items: center; gap: 8px; }
+  .toggle-label { font-size: 11px; font-weight: 700; letter-spacing: 0.5px; color: var(--text-sub); text-transform: uppercase; }
+  /* iOS-style toggle */
+  .toggle-switch { position: relative; width: 48px; height: 28px; flex-shrink: 0; }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-track { position: absolute; inset: 0; background: var(--border); border-radius: 28px; cursor: pointer; transition: background .2s; }
+  .toggle-track::before { content: ''; position: absolute; width: 22px; height: 22px; left: 3px; top: 3px; background: white; border-radius: 50%; box-shadow: 0 1px 4px rgba(0,0,0,0.2); transition: transform .2s; }
+  .toggle-switch input:checked + .toggle-track { background: var(--green); }
+  .toggle-switch input:checked + .toggle-track::before { transform: translateX(20px); }
+
+  .notes-card { margin: 0 16px 14px; background: #F8FAFC; border-radius: 20px; padding: 20px; }
+  .notes-card-title { font-size: 16px; font-weight: 700; margin-bottom: 14px; }
+  .notes-textarea { width: 100%; background: white; border: 1.5px solid var(--border); border-radius: 14px; padding: 14px; font-size: 14px; color: var(--text); font-family: inherit; resize: none; outline: none; line-height: 1.6; min-height: 100px; transition: border-color .15s; }
+  .notes-textarea:focus { border-color: var(--blue); }
+  .notes-textarea::placeholder { color: var(--text-light); }
+
+  .submit-area { padding: 4px 16px 8px; }
+  .btn-submit-log { width: 100%; background: var(--blue); color: white; border: none; border-radius: 50px; padding: 18px; font-size: 17px; font-weight: 700; cursor: pointer; transition: background .15s, transform .1s; letter-spacing: 0.3px; }
+  .btn-submit-log:active { background: var(--blue-dark); transform: scale(0.98); }
+  .submit-footer { text-align: center; padding: 10px 16px 0; font-size: 10px; font-weight: 600; color: var(--text-light); letter-spacing: 1px; text-transform: uppercase; }
+
+  /* ── LOG ENTRY ── */
+  .log-entry { display: flex; align-items: center; gap: 14px; padding: 14px 20px; border-bottom: 1px solid var(--border); }
+  .log-entry:last-child { border-bottom: none; }
+  .log-date-box { width: 44px; text-align: center; flex-shrink: 0; }
+  .log-date-box .day { font-size: 22px; font-weight: 800; line-height: 1; }
+  .log-date-box .wday { font-size: 11px; color: var(--text-sub); font-weight: 600; }
+  .log-bar-bg { flex: 1; height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .log-bar-fill { height: 100%; border-radius: 3px; }
+  .score-bar-wrap { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+  .score-bar-wrap:last-child { margin-bottom: 0; }
+  .log-score-lbl { font-size: 11px; font-weight: 600; width: 22px; }
+  .log-score-val { font-size: 12px; font-weight: 700; width: 16px; text-align: right; }
+
+  /* ── TIMER MODAL ── */
+  .timer-modal { display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.7); z-index: 200; align-items: flex-end; justify-content: center; }
+  .timer-modal.open { display: flex; }
+  .timer-sheet { background: var(--card); border-radius: 24px 24px 0 0; padding: 32px 24px 48px; width: 100%; max-width: 430px; text-align: center; }
+  .timer-sheet h3 { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+  .timer-sheet p { font-size: 14px; color: var(--text-sub); margin-bottom: 24px; }
+  .timer-circle { width: 180px; height: 180px; margin: 0 auto 24px; position: relative; display: flex; align-items: center; justify-content: center; }
+  .timer-circle svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+  #timer-display { font-size: 48px; font-weight: 800; color: var(--blue); font-variant-numeric: tabular-nums; }
+  .timer-btn-row { display: flex; gap: 12px; }
+  .btn-secondary { flex: 1; background: var(--bg); border: none; border-radius: 14px; padding: 14px; font-size: 15px; font-weight: 700; color: var(--text); cursor: pointer; }
+
+  ::-webkit-scrollbar { display: none; }
+
+  /* ── PLAN PAGE ── */
+  #page-plan { background: white; }
+  .plan-hero { padding: 28px 24px 20px; position: relative; }
+  .plan-hero-label { font-size: 11px; font-weight: 700; color: var(--blue); letter-spacing: 1.2px; text-transform: uppercase; margin-bottom: 10px; }
+  .plan-hero-title { font-size: 26px; font-weight: 800; line-height: 1.2; color: var(--text); margin-bottom: 8px; }
+  .plan-hero-title span { color: var(--green); }
+  .plan-hero-sub { font-size: 13px; color: var(--text-sub); line-height: 1.6; }
+  .status-pill {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--green); color: white;
+    padding: 7px 14px 7px 10px; border-radius: 50px;
+    font-size: 12px; font-weight: 700;
+    position: absolute; top: 28px; right: 24px;
+  }
+  .status-pill svg { width: 16px; height: 16px; fill: white; }
+
+  /* Recovery ring card */
+  .recovery-card { margin: 0 16px 16px; background: #F8FAFC; border-radius: 22px; padding: 24px 20px 20px; }
+  .recovery-ring-wrap { display: flex; justify-content: center; margin-bottom: 22px; position: relative; }
+  .recovery-ring-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+  .recovery-ring-pct { font-size: 38px; font-weight: 800; color: var(--text); line-height: 1; }
+  .recovery-ring-pct sup { font-size: 16px; font-weight: 700; }
+  .recovery-ring-lbl { font-size: 11px; font-weight: 700; color: var(--text-sub); letter-spacing: 0.8px; margin-top: 4px; text-transform: uppercase; }
+  .recovery-progress-title { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+  .recovery-progress-desc { font-size: 13px; color: var(--text-sub); line-height: 1.6; margin-bottom: 14px; }
+  .metric-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+  .metric-pill { background: white; border: 1.5px solid var(--border); border-radius: 20px; padding: 5px 12px; font-size: 12px; font-weight: 600; color: var(--text-sub); }
+
+  /* Trend section */
+  .trend-section { margin: 0 16px 16px; }
+  .trend-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .trend-title { font-size: 18px; font-weight: 800; }
+  .trend-growth { font-size: 13px; font-weight: 700; color: var(--green); }
+  .trend-sub { font-size: 12px; color: var(--text-sub); margin-bottom: 10px; }
+
+  /* Protocol list */
+  .protocol-section { margin: 0 16px 16px; }
+  .protocol-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .protocol-title { font-size: 18px; font-weight: 800; }
+  .protocol-link { font-size: 13px; font-weight: 600; color: var(--blue); cursor: pointer; }
+  .proto-item {
+    background: #F8FAFC; border-radius: 14px;
+    padding: 14px 16px; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 14px;
+    cursor: pointer; transition: background .1s;
+  }
+  .proto-item:active { background: var(--border); }
+  .proto-check {
+    width: 26px; height: 26px; border-radius: 7px;
+    border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: all .2s; background: white;
+  }
+  .proto-check.done { background: var(--green); border-color: var(--green); }
+  .proto-check svg { display: none; width: 14px; height: 14px; fill: white; }
+  .proto-check.done svg { display: block; }
+  .proto-info { flex: 1; }
+  .proto-name { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+  .proto-name.done-text { color: var(--text-sub); text-decoration: line-through; text-decoration-color: var(--green); }
+  .proto-meta { font-size: 12px; color: var(--text-sub); }
+  .proto-meta.done-meta { color: var(--green); font-weight: 600; }
+
+  /* CTA card */
+  .cta-card {
+    margin: 0 16px 16px;
+    background: linear-gradient(135deg, #1D4ED8 0%, #2563EB 60%, #3B82F6 100%);
+    border-radius: 22px; padding: 24px 22px 22px;
+    position: relative; overflow: hidden;
+  }
+  .cta-card::after { content:''; position:absolute; top:-40px; right:-40px; width:140px; height:140px; background:rgba(255,255,255,0.08); border-radius:50%; pointer-events:none; }
+  .cta-card::before { content:''; position:absolute; bottom:-60px; right:20px; width:120px; height:120px; background:rgba(255,255,255,0.05); border-radius:50%; pointer-events:none; }
+  .cta-title { font-size: 18px; font-weight: 800; color: white; margin-bottom: 6px; line-height: 1.3; }
+  .cta-sub { font-size: 13px; color: rgba(255,255,255,0.8); margin-bottom: 20px; line-height: 1.5; }
+  .cta-btn { background: white; border: none; border-radius: 50px; padding: 14px 28px; font-size: 15px; font-weight: 700; color: var(--blue); cursor: pointer; transition: opacity .15s; }
+  .cta-btn:active { opacity: 0.9; }
+
+  /* ── LOG PAGE ── */
+  #page-log { background: #F1F5F9; }
+  .log-month-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 24px 20px 16px; background: #F1F5F9;
+  }
+  .log-month-title { font-size: 26px; font-weight: 800; color: var(--text); }
+  .month-nav-btns { display: flex; gap: 8px; }
+  .month-nav-btn {
+    width: 40px; height: 40px; background: white; border: none;
+    border-radius: 12px; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    color: var(--blue); font-size: 16px; font-weight: 700;
+    transition: background .1s;
+  }
+  .month-nav-btn:active { background: var(--bg); }
+  .month-nav-btn svg { width: 18px; height: 18px; fill: var(--blue); }
+
+  /* Activity overview */
+  .activity-overview { padding: 0 0 8px; }
+  .ao-header { display: flex; justify-content: space-between; align-items: flex-end; padding: 20px 20px 14px; }
+  .ao-title { font-size: 22px; font-weight: 800; }
+  .ao-date { font-size: 14px; color: var(--blue); font-weight: 600; margin-top: 2px; }
+  .ao-link { font-size: 12px; font-weight: 700; color: var(--blue); letter-spacing: 0.5px; cursor: pointer; text-transform: uppercase; }
+
+  .ao-item {
+    background: white; border-radius: 16px;
+    margin: 0 16px 10px;
+    padding: 14px 16px;
+    display: flex; align-items: center; gap: 14px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .ao-item.incomplete {
+    background: white;
+    border: 1.5px dashed var(--border);
+    box-shadow: none;
+  }
+  .ao-item-icon {
+    width: 46px; height: 46px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+  }
+  .ao-item-icon.done-icon { background: var(--green-light); }
+  .ao-item-icon.todo-icon { background: #F1F5F9; }
+  .ao-item-info { flex: 1; }
+  .ao-item-name { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+  .ao-item-name.todo-name { color: var(--text-sub); }
+  .ao-item-sub { font-size: 12px; color: var(--text-sub); }
+  .ao-item-sub.done-sub { color: var(--green); font-weight: 600; }
+  .ao-check-done {
+    width: 28px; height: 28px; background: var(--green); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .ao-check-done svg { width: 16px; height: 16px; fill: white; }
+  .ao-check-empty {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 2px solid var(--border); flex-shrink: 0;
+  }
+
+  /* Pain summary card */
+  .pain-summary-card {
+    margin: 0 16px 12px; background: white; border-radius: 16px;
+    padding: 14px 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    display: flex; align-items: center; gap: 16px;
+  }
+  .pain-summary-item { flex: 1; text-align: center; }
+  .pain-summary-num { font-size: 24px; font-weight: 800; }
+  .pain-summary-lbl { font-size: 11px; color: var(--text-sub); font-weight: 600; margin-top: 2px; }
+  .pain-summary-divider { width: 1px; height: 36px; background: var(--border); flex-shrink: 0; }
+
+  /* Empty state */
+  .ao-empty { text-align: center; padding: 32px 20px; color: var(--text-sub); }
+  .ao-empty-icon { font-size: 36px; margin-bottom: 10px; }
+  .ao-empty-text { font-size: 14px; font-weight: 600; }
+
+  /* ── TRENDS PAGE ── */
+  #page-trends { background: white; }
+
+  /* Phase timeline */
+  .phases-outer { position: relative; padding: 0 20px 8px 72px; }
+  .phases-vline {
+    position: absolute; left: 40px; top: 44px;
+    width: 2px; background: var(--border);
+    bottom: 44px; border-radius: 1px;
+  }
+  .phase-row { position: relative; margin-bottom: 20px; }
+  .phase-row:last-child { margin-bottom: 0; }
+  .timeline-icon {
+    position: absolute; left: -52px; top: 0;
+    width: 44px; height: 44px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 2; flex-shrink: 0;
+  }
+  .timeline-icon svg { width: 22px; height: 22px; }
+  .timeline-icon.done { background: var(--green); box-shadow: 0 4px 12px rgba(22,163,74,0.35); }
+  .timeline-icon.current { background: var(--blue); box-shadow: 0 4px 12px rgba(37,99,235,0.35); }
+  .timeline-icon.locked { background: #E2E8F0; }
+  .timeline-card {
+    background: white; border-radius: 18px; padding: 20px;
+    box-shadow: 0 2px 14px rgba(0,0,0,0.08);
+  }
+  .timeline-card.locked-card { background: #F8FAFC; box-shadow: none; border: 1.5px solid var(--border); }
+  .phase-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .phase-status-badge { font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 20px; letter-spacing: 0.5px; text-transform: uppercase; }
+  .phase-status-badge.done { background: var(--green-light); color: var(--green); }
+  .phase-status-badge.current { background: var(--blue-light); color: var(--blue); }
+  .phase-status-badge.locked { background: var(--border); color: var(--text-light); }
+  .phase-weeks { font-size: 12px; font-weight: 600; color: var(--text-sub); }
+  .phase-card-title { font-size: 20px; font-weight: 800; margin-bottom: 8px; line-height: 1.25; }
+  .phase-card-title.locked-text { color: var(--text-sub); }
+  .phase-card-desc { font-size: 13px; color: var(--text-sub); line-height: 1.6; margin-bottom: 12px; }
+  .phase-milestone { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: var(--green); }
+  .phase-milestone svg { width: 16px; height: 16px; fill: var(--green); }
+  .phase-weekly-progress { margin-bottom: 12px; }
+  .phase-wp-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .phase-wp-label { font-size: 13px; font-weight: 700; }
+  .phase-wp-pct { font-size: 13px; font-weight: 700; color: var(--blue); }
+  .phase-wp-bar { height: 7px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .phase-wp-fill { height: 100%; border-radius: 4px; background: var(--blue); transition: width .6s ease; }
+  .phase-continue-btn { width: 100%; background: var(--blue); color: white; border: none; border-radius: 50px; padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer; transition: background .15s; }
+  .phase-continue-btn:active { background: var(--blue-dark); }
+
+  /* Activity recs */
+  .activity-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 16px; background: #F8FAFC; border-radius: 14px;
+    margin-bottom: 10px;
+  }
+  .activity-icon { font-size: 24px; width: 44px; height: 44px; background: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(0,0,0,0.08); flex-shrink: 0; }
+  .activity-info { flex: 1; }
+  .activity-name { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+  .activity-desc { font-size: 12px; color: var(--text-sub); line-height: 1.4; }
+  .activity-badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; flex-shrink: 0; }
+
+  /* Sports prediction */
+  .sport-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 0; border-bottom: 1px solid var(--border);
+  }
+  .sport-row:last-child { border-bottom: none; }
+  .sport-icon { font-size: 20px; width: 36px; text-align: center; flex-shrink: 0; }
+  .sport-name { flex: 1; font-size: 14px; font-weight: 600; }
+  .sport-days { text-align: right; }
+  .sport-days-num { font-size: 16px; font-weight: 800; }
+  .sport-days-lbl { font-size: 10px; color: var(--text-sub); font-weight: 600; }
+  .sport-bar-wrap { flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; margin: 0 8px; }
+  .sport-bar-fill { height: 100%; border-radius: 2px; }
+
+  /* FAB */
+  .fab {
+    position: fixed; bottom: calc(var(--nav-h) + 16px); right: calc(50% - 215px + 16px);
+    width: 52px; height: 52px; border-radius: 50%;
+    background: var(--blue); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 16px rgba(37,99,235,0.45);
+    z-index: 90; transition: transform .15s;
+  }
+  .fab:active { transform: scale(0.92); }
+  .fab svg { width: 24px; height: 24px; fill: white; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-logo">
+    <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+  </div>
+  <div class="header-title">踝关节康复</div>
+  <div class="header-bell">
+    <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5S10.5 3.17 10.5 4v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+  </div>
+</div>
+
+<!-- HOME -->
+<div class="page active" id="page-home">
+
+  <!-- Assessment header -->
+  <div class="assess-header" id="checkin-card">
+    <div class="assess-label" id="hero-day">每日评估</div>
+    <div class="assess-title">今天你的<br>脚踝怎么样？</div>
+    <div class="assess-subtitle" id="hero-trend">每日记录帮助我们动态调整你的康复训练计划，获得更好的恢复效果。</div>
+  </div>
+
+  <!-- Warning banner -->
+  <div class="warning-banner" id="warn-banner" style="display:none;margin:0 16px 14px;">
+    <svg viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm1 14h-2v2h2v-2zm0-6h-2v4h2v-4z"/></svg>
+    <p id="warn-text"></p>
+  </div>
+
+  <!-- Already checked -->
+  <div class="checked-banner" id="checked-banner" style="display:none;margin-bottom:14px;">
+    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.41L6.41 12.83l1.41-1.42L10 13.58l6.17-6.17 1.42 1.41L10 16.41z"/></svg>
+    <div style="flex:1;"><h4>今日已打卡</h4><p id="checked-desc"></p></div>
+    <button onclick="reEditCheckin()" style="background:rgba(22,163,74,0.12);border:none;border-radius:10px;padding:7px 12px;font-size:12px;font-weight:700;color:var(--green);cursor:pointer;flex-shrink:0;">修改</button>
+  </div>
+
+  <!-- Pain Level card -->
+  <div class="pain-card" id="submit-area-pain">
+    <div class="pain-card-header">
+      <span class="pain-card-title">疼痛程度</span>
+      <span class="pain-current-pill" id="pain-pill">当前：5 / 10</span>
+    </div>
+    <input type="range" min="0" max="10" value="5" id="pain-slider" style="--pct:50%"
+      oninput="updatePainSlider(this)">
+    <div class="pain-markers">
+      <span>无痛</span><span>中等</span><span>剧烈</span>
+    </div>
+  </div>
+
+  <!-- Swelling + Stiffness toggles -->
+  <div class="toggle-row" id="toggle-row">
+    <div class="toggle-card">
+      <div class="toggle-icon">
+        <svg viewBox="0 0 24 24" fill="#2563EB"><path d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2c0-3.32-2.67-7.25-8-11.8z"/></svg>
+      </div>
+      <div class="toggle-name">肿胀</div>
+      <div class="toggle-row-inner">
+        <label class="toggle-switch">
+          <input type="checkbox" id="swell-toggle">
+          <span class="toggle-track"></span>
+        </label>
+        <span class="toggle-label">存在</span>
+      </div>
+    </div>
+    <div class="toggle-card">
+      <div class="toggle-icon">
+        <svg viewBox="0 0 24 24" fill="#16A34A"><path d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.6 13.9l1-4.4 2.1 2v6h2v-7.5l-2.1-2 .6-3c1.3 1.5 3.3 2.5 5.5 2.5v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1l-5.2 2.2v4.7h2v-3.4l1.8-.7-1.6 8.1-4.9-1-.4 2 7 1.4z"/></svg>
+      </div>
+      <div class="toggle-name">僵硬感</div>
+      <div class="toggle-row-inner">
+        <label class="toggle-switch">
+          <input type="checkbox" id="stiff-toggle" checked>
+          <span class="toggle-track"></span>
+        </label>
+        <span class="toggle-label">存在</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Personal Notes -->
+  <div class="notes-card" id="notes-card">
+    <div class="notes-card-title">个人备注</div>
+    <textarea class="notes-textarea" id="notes-input" placeholder="描述一下今天活动时哪些动作引起了不适…" rows="4"></textarea>
+  </div>
+
+  <!-- Submit -->
+  <div class="submit-area" id="submit-area">
+    <button class="btn-submit-log" onclick="submitCheckin()">提交今日记录</button>
+  </div>
+  <div class="submit-footer" id="submit-footer">• 记录将用于动态调整你的康复计划 •</div>
+
+</div>
+
+<!-- PLAN -->
+<div class="page" id="page-plan">
+
+  <!-- Hero header -->
+  <div class="plan-hero">
+    <div class="plan-hero-label">患者康复仪表盘</div>
+    <div class="plan-hero-title" id="plan-hero-title">恢复进展<span id="plan-hero-accent">良好</span></div>
+    <div class="plan-hero-sub" id="plan-hero-sub">保持规律性是恢复活动能力的关键。继续坚持你的康复训练计划。</div>
+    <div class="status-pill" id="plan-status-pill">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.41L6.41 12.83l1.41-1.42L10 13.58l6.17-6.17 1.42 1.41L10 16.41z"/></svg>
+      <span id="plan-status-text">状态稳定</span>
+    </div>
+  </div>
+
+  <!-- Warning -->
+  <div class="warning-banner" id="plan-warn" style="display:none;margin:0 16px 14px;">
+    <svg viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm1 14h-2v2h2v-2zm0-6h-2v4h2v-4z"/></svg>
+    <p id="plan-warn-text"></p>
+  </div>
+
+  <!-- Recovery ring card -->
+  <div class="recovery-card">
+    <div class="recovery-ring-wrap">
+      <svg width="160" height="160" viewBox="0 0 160 160">
+        <circle cx="80" cy="80" r="68" fill="none" stroke="#E2E8F0" stroke-width="10"/>
+        <circle id="plan-big-ring" cx="80" cy="80" r="68" fill="none" stroke="var(--green)" stroke-width="10"
+          stroke-dasharray="427.3" stroke-dashoffset="427.3" stroke-linecap="round"
+          transform="rotate(-90 80 80)" style="transition:stroke-dashoffset .8s ease"/>
+      </svg>
+      <div class="recovery-ring-center">
+        <div class="recovery-ring-pct"><span id="plan-ring-num">0</span><sup>%</sup></div>
+        <div class="recovery-ring-lbl">完成度</div>
+      </div>
+    </div>
+    <div class="recovery-progress-title">整体进展</div>
+    <div class="recovery-progress-desc" id="plan-progress-desc">根据你的每日记录动态调整训练方案，帮助你更快更安全地恢复。</div>
+    <div class="metric-pills" id="plan-metric-pills"></div>
+  </div>
+
+  <!-- Mobility trend -->
+  <div class="trend-section">
+    <div class="trend-header">
+      <div class="trend-title">疼痛趋势</div>
+      <div class="trend-growth" id="plan-trend-growth"></div>
+    </div>
+    <div class="trend-sub">最近 7 天</div>
+    <svg id="plan-sparkline" width="100%" height="60" viewBox="0 0 320 60" preserveAspectRatio="none" style="display:block;"></svg>
+  </div>
+
+  <!-- Today's Protocol -->
+  <div class="protocol-section">
+    <div class="protocol-header">
+      <div class="protocol-title">今日训练方案</div>
+      <div class="protocol-link" onclick="switchTab('log')">查看日历</div>
+    </div>
+    <div id="exercise-list"></div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-card" id="plan-cta">
+    <div class="cta-title" id="cta-title">准备好开始今日训练了吗？</div>
+    <div class="cta-sub" id="cta-sub">开始你的康复训练，完成每一个动作。</div>
+    <button class="cta-btn" onclick="startSession()">开始训练</button>
+  </div>
+
+</div>
+
+<!-- FAB -->
+<button class="fab" id="fab-btn" onclick="switchTab('log')" style="display:none;">
+  <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+</button>
+
+<!-- GUIDE -->
+<div class="page" id="page-guide">
+  <div class="video-area">
+    <div class="video-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+  </div>
+
+  <div style="margin:-24px 12px 0;position:relative;z-index:1;">
+    <div class="card" style="padding:20px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+        <span class="badge badge-green"><span class="badge-dot"></span>踝关节康复</span>
+        <span style="font-size:12px;color:var(--text-sub);font-weight:600;" id="guide-day-label"></span>
+      </div>
+      <div style="font-size:26px;font-weight:800;margin-bottom:6px;" id="guide-name">—</div>
+      <div style="font-size:14px;color:var(--text-sub);line-height:1.5;margin-bottom:18px;" id="guide-desc"></div>
+      <div style="display:flex;gap:16px;" id="guide-rings"></div>
+    </div>
+  </div>
+
+  <div style="margin-top:16px;">
+    <div class="section-label" style="padding-top:4px;">引导说明</div>
+    <div class="card" style="margin:0 16px;" id="guide-steps"></div>
+  </div>
+
+  <div style="padding:16px 16px 8px;">
+    <button class="btn-primary" onclick="openTimer()">
+      <svg viewBox="0 0 24 24"><path d="M15 1H9v2h6V1zm-4 13h2V8h-2v6zm8.03-6.61l1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42C16.07 4.74 14.12 4 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9 9-4.03 9-9c0-2.12-.74-4.07-1.97-5.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
+      <span id="guide-timer-label">开始训练计时</span>
+    </button>
+    <div style="text-align:center;margin-top:6px;">
+      <button class="btn-text" onclick="skipGuide()">跳过此项目</button>
+    </div>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;padding:0 16px 8px;">
+    <button onclick="prevExercise()" id="btn-prev" style="background:var(--bg);border:none;border-radius:12px;padding:10px 18px;font-size:14px;font-weight:600;color:var(--text-sub);cursor:pointer;">← 上一个</button>
+    <button onclick="nextExercise()" id="btn-next" style="background:var(--blue-light);border:none;border-radius:12px;padding:10px 18px;font-size:14px;font-weight:700;color:var(--blue);cursor:pointer;">下一个 →</button>
+  </div>
+</div>
+
+<!-- LOG -->
+<div class="page" id="page-log">
+
+  <!-- Month header with navigation -->
+  <div class="log-month-header">
+    <div class="log-month-title" id="log-month-title">2026年3月</div>
+    <div class="month-nav-btns">
+      <button class="month-nav-btn" onclick="shiftMonth(-1)">
+        <svg viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6z"/></svg>
+      </button>
+      <button class="month-nav-btn" onclick="shiftMonth(1)">
+        <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Calendar card -->
+  <div style="margin:0 16px 8px;background:white;border-radius:20px;box-shadow:0 2px 12px rgba(0,0,0,0.07);overflow:hidden;">
+    <div class="cal-grid" id="cal-labels"></div>
+    <div class="cal-grid" id="cal-grid"></div>
+    <!-- Legend -->
+    <div style="display:flex;gap:14px;padding:10px 18px 14px;border-top:1px solid var(--border);">
+      <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-sub);font-weight:600;">
+        <div style="width:12px;height:12px;border-radius:4px;background:var(--green-light);"></div>好转
+      </div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-sub);font-weight:600;">
+        <div style="width:12px;height:12px;border-radius:4px;background:var(--yellow-light);"></div>中等
+      </div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-sub);font-weight:600;">
+        <div style="width:12px;height:12px;border-radius:4px;background:var(--red-light);"></div>较重
+      </div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-sub);font-weight:600;">
+        <div style="width:12px;height:12px;border-radius:4px;background:var(--blue);"></div>今天
+      </div>
+    </div>
+  </div>
+
+  <!-- Activity Overview -->
+  <div class="activity-overview">
+    <div class="ao-header">
+      <div>
+        <div class="ao-title">训练记录</div>
+        <div class="ao-date" id="ao-date-label">今天</div>
+      </div>
+      <div class="ao-link" onclick="switchTab('plan')">查看计划 →</div>
+    </div>
+
+    <!-- Pain summary for selected day -->
+    <div id="ao-pain-card"></div>
+
+    <!-- Exercise items -->
+    <div id="ao-items"></div>
+  </div>
+
+</div>
+
+<!-- TRENDS -->
+<div class="page" id="page-trends">
+
+  <!-- Recovery Path Header -->
+  <div style="padding:28px 24px 20px;background:white;">
+    <div class="plan-hero-label" style="color:var(--blue);">你的康复路径</div>
+    <div style="font-size:26px;font-weight:800;color:var(--text);margin-bottom:16px;line-height:1.2;">踝关节康复方案</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div style="background:#F8FAFC;border-radius:16px;padding:16px;">
+        <div style="font-size:10px;font-weight:700;color:var(--text-sub);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;">总计划时长</div>
+        <div style="font-size:28px;font-weight:800;color:var(--blue);line-height:1;" id="trends-duration">28</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text-sub);margin-top:2px;">天</div>
+      </div>
+      <div style="background:#F8FAFC;border-radius:16px;padding:16px;position:relative;overflow:hidden;">
+        <div style="font-size:10px;font-weight:700;color:var(--text-sub);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;">预计完成</div>
+        <div style="font-size:20px;font-weight:800;color:var(--text);line-height:1.2;" id="trends-finish-date">—</div>
+        <div style="font-size:11px;color:var(--text-sub);margin-top:4px;">Estimated Completion</div>
+        <svg style="position:absolute;bottom:10px;right:12px;opacity:0.12;" width="36" height="36" viewBox="0 0 24 24" fill="var(--blue)"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-2 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase Timeline -->
+  <div style="padding:0 20px 8px;position:relative;" id="phase-timeline"></div>
+
+  <!-- Activity Recommendations -->
+  <div style="padding:0 20px 8px;">
+    <div style="font-size:18px;font-weight:800;margin-bottom:4px;">现在可以做的运动</div>
+    <div style="font-size:13px;color:var(--text-sub);margin-bottom:14px;">基于你当前的康复阶段和疼痛程度</div>
+    <div id="activity-recs"></div>
+  </div>
+
+  <!-- Sports Recovery Prediction -->
+  <div style="padding:0 20px 8px;">
+    <div style="font-size:18px;font-weight:800;margin-bottom:4px;">运动恢复预测</div>
+    <div style="font-size:13px;color:var(--text-sub);margin-bottom:14px;">按当前恢复速度，预计可以恢复各项运动的时间</div>
+    <div id="sports-prediction"></div>
+  </div>
+
+  <!-- Motivational footer -->
+  <div style="text-align:center;padding:24px 32px 16px;">
+    <div style="font-size:28px;margin-bottom:12px;">🌿</div>
+    <div style="font-size:18px;font-weight:800;margin-bottom:8px;">康复不是一条直线</div>
+    <div style="font-size:13px;color:var(--text-sub);line-height:1.7;" id="trends-motivation">保持耐心，每一天的坚持都在为无痛生活打下基础。</div>
+  </div>
+
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-item active" id="nav-home" onclick="switchTab('home')">
+    <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></div>
+    <span class="nav-label">HOME</span>
+  </div>
+  <div class="nav-item" id="nav-plan" onclick="switchTab('plan')">
+    <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg></div>
+    <span class="nav-label">PLAN</span>
+  </div>
+  <div class="nav-item" id="nav-guide" onclick="switchTab('guide')">
+    <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.6 13.9l1-4.4 2.1 2v6h2v-7.5l-2.1-2 .6-3c1.3 1.5 3.3 2.5 5.5 2.5v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1l-5.2 2.2v4.7h2v-3.4l1.8-.7-1.6 8.1-4.9-1-.4 2 7 1.4z"/></svg></div>
+    <span class="nav-label">GUIDE</span>
+  </div>
+  <div class="nav-item" id="nav-log" onclick="switchTab('log')">
+    <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/></svg></div>
+    <span class="nav-label">LOG</span>
+  </div>
+  <div class="nav-item" id="nav-trends" onclick="switchTab('trends')">
+    <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg></div>
+    <span class="nav-label">TRENDS</span>
+  </div>
+</nav>
+
+<!-- TIMER MODAL -->
+<div class="timer-modal" id="timer-modal" onclick="closeTimerOutside(event)">
+  <div class="timer-sheet">
+    <h3 id="timer-ex-name">训练计时</h3>
+    <p id="timer-ex-sub">第 1 组 / 共 3 组</p>
+    <div class="timer-circle">
+      <svg width="180" height="180" viewBox="0 0 180 180">
+        <circle cx="90" cy="90" r="80" fill="none" stroke="var(--border)" stroke-width="8"/>
+        <circle id="timer-ring" cx="90" cy="90" r="80" fill="none" stroke="var(--blue)" stroke-width="8"
+          stroke-dasharray="502.7" stroke-dashoffset="0" stroke-linecap="round"
+          transform="rotate(-90 90 90)" style="transition:stroke-dashoffset .1s linear"/>
+      </svg>
+      <div id="timer-display">1:00</div>
+    </div>
+    <div class="timer-btn-row">
+      <button class="btn-secondary" onclick="closeTimer()">取消</button>
+      <button class="btn-primary" style="flex:2;" onclick="toggleTimer()" id="timer-toggle-btn">
+        <svg viewBox="0 0 24 24" id="timer-icon"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+        <span id="timer-btn-label">暂停</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────
+const START_DATE = '2026-03-12';
+const TODAY = '2026-03-20';
+
+const SEED = [
+  { date:'2026-03-12', pain:8, swelling:8, completed:[] },
+  { date:'2026-03-13', pain:7, swelling:8, completed:[] },
+  { date:'2026-03-14', pain:7, swelling:7, completed:[] },
+  { date:'2026-03-15', pain:6, swelling:7, completed:[] },
+  { date:'2026-03-16', pain:5, swelling:6, completed:[] },
+  { date:'2026-03-17', pain:5, swelling:5, completed:[] },
+  { date:'2026-03-18', pain:4, swelling:5, completed:[] },
+  { date:'2026-03-19', pain:3, swelling:4, completed:[] },
+];
+
+let state = JSON.parse(localStorage.getItem('ankle_v4') || 'null');
+if (!state) { state = { startDate: START_DATE, entries: SEED }; save(); }
+function save() { localStorage.setItem('ankle_v4', JSON.stringify(state)); }
+function getEntry(d) { return state.entries.find(e => e.date === d) || null; }
+function getDayNum(d) { return Math.floor((new Date(d) - new Date(state.startDate)) / 86400000) + 1; }
+function getPhase(day, pain) {
+  if (pain > 5 && day <= 14) return 1;
+  if (day <= 7) return 1;
+  if (day <= 14) return 2;
+  if (day <= 21) return 3;
+  return 4;
+}
+function painClass(p) { return p <= 3 ? 'badge-green' : p <= 6 ? 'badge-yellow' : 'badge-red'; }
+function painLabel(p) { return p <= 3 ? '好转' : p <= 6 ? '中等' : '较重'; }
+
+// ── EXERCISES ─────────────────────────────────────────────────────────
+const EX = {
+  rice: { id:'rice', icon:'🧊', name:'RICE 护理', desc:'休息、冰敷、加压包扎、抬高患肢，急性期最重要的基础护理。', sets:4, duration:20, timerSec:1200,
+    steps:[{title:'休息 (Rest)',desc:'停止负重活动，让受伤踝关节充分休息。'},{title:'冰敷 (Ice)',desc:'用毛巾包裹冰袋敷踝关节，每次 15-20 分钟，避免直接接触皮肤。'},{title:'加压 (Compression)',desc:'用弹性绷带适度包扎踝关节，从足趾向上缠绕，不要过紧。'},{title:'抬高 (Elevation)',desc:'将脚抬高至心脏水平以上，有助于减少肿胀。'}]},
+  circles: { id:'circles', icon:'🔄', name:'踝关节画圆', desc:'轻柔改善关节活动范围，减少僵硬感。', sets:3, reps:15, timerSec:60,
+    steps:[{title:'初始姿势',desc:'坐在椅子上，脚平放地面。将受伤的腿略微抬起，踝关节悬空。'},{title:'顺时针旋转',desc:'缓慢地将脚按顺时针方向画圆，尽量画大，但不引起明显疼痛。'},{title:'逆时针旋转',desc:'完成 15 次后，改为逆时针方向再画 15 次。'}]},
+  alphabet: { id:'alphabet', icon:'✏️', name:'踝关节字母描写', desc:'用大脚趾在空中"写"字母 A-Z，全面训练踝关节各方向活动度。', sets:2, timerSec:90,
+    steps:[{title:'坐姿准备',desc:'坐稳，受伤的脚抬起，踝关节悬空，放松小腿。'},{title:'描写字母',desc:'用大脚趾在空中缓慢描写字母 A 到 Z，保持动作流畅，感受踝关节各方向活动。'},{title:'控制节奏',desc:'全程不要引起剧烈疼痛，轻微酸胀感是正常的。完成一遍后休息 30 秒再重复。'}]},
+  seated_calf: { id:'seated_calf', icon:'💪', name:'坐姿提踵', desc:'强化小腿肌肉，为负重行走做准备，坐姿减轻踝关节压力。', sets:3, reps:15, timerSec:60,
+    steps:[{title:'坐稳',desc:'坐在椅子边缘，双脚平放地面，与肩同宽。保持脊背挺直。'},{title:'缓慢提踵',desc:'将脚跟缓慢抬起，脚尖撑地，保持 2 秒，感受小腿发力。'},{title:'缓慢放下',desc:'用 3 秒缓慢将脚跟放回地面，不要砸地。'}]},
+  towel: { id:'towel', icon:'🎯', name:'毛巾抓握', desc:'锻炼足底肌肉和趾屈肌群，增强足弓稳定性。', sets:3, duration:30, timerSec:30,
+    steps:[{title:'铺毛巾',desc:'将薄毛巾铺在地上，赤脚踩在毛巾上，保持坐姿。'},{title:'抓握',desc:'用脚趾用力抓握毛巾，保持 3-5 秒后松开，重复 30 秒。'},{title:'稳定踝关节',desc:'过程中保持踝关节稳定，感受足底肌肉发力，不要引起疼痛。'}]},
+  balance: { id:'balance', icon:'🧘', name:'单腿平衡站立', desc:'训练本体感觉和踝关节稳定性，预防再次扭伤的核心练习。', sets:3, duration:30, timerSec:30,
+    steps:[{title:'扶墙准备',desc:'站在平坦地面旁，手可以轻扶墙。将重心转移到受伤的脚上。'},{title:'单腿站立',desc:'缓慢抬起健侧脚，用受伤踝关节单腿站立，保持 30 秒。如有不稳立即扶墙。'},{title:'进阶训练',desc:'熟练后可尝试闭眼站立 10 秒，或站在折叠毛巾上增加难度。'}]},
+  band: { id:'band', icon:'🏋️', name:'弹力带训练', desc:'弹力带抗阻训练，全面强化踝关节稳定肌群。', sets:3, reps:15, timerSec:60,
+    steps:[{title:'固定弹力带',desc:'将弹力带一端固定在桌脚，另一端套在脚背，坐椅子保持小腿水平。'},{title:'背屈训练',desc:'脚尖向上勾起（背屈），对抗弹力带阻力，保持 2 秒后缓慢还原。15 次一组。'},{title:'各方向练习',desc:'调整弹力带方向，分别训练：内翻、外翻。每方向 15 次。'}]},
+  stand_calf: { id:'stand_calf', icon:'🦵', name:'站姿提踵', desc:'负重提踵，强化小腿三头肌，改善踝关节动态稳定性。', sets:3, reps:15, timerSec:60,
+    steps:[{title:'扶墙站立',desc:'双手轻扶墙面，双脚与肩同宽站立，均匀分配体重。'},{title:'双脚提踵',desc:'双脚同时缓慢抬起脚跟，脚尖站立，保持 2 秒，感受小腿收紧。'},{title:'缓慢落下',desc:'花 3 秒缓慢放下脚跟，控制整个离心阶段。'}]},
+};
+
+// ── PLAN LOGIC ────────────────────────────────────────────────────────
+function generatePlan(day, pain, swell) {
+  const phase = getPhase(day, pain);
+  let ids = [], tip = '', phaseName = '';
+  if (phase === 1) {
+    phaseName = '第一阶段：急性期护理';
+    if (pain >= 7) { ids = ['rice','circles']; tip = '疼痛较重，以休息和冰敷为主，轻柔活动即可。'; }
+    else if (pain >= 4) { ids = ['rice','circles','alphabet']; tip = '保持基础护理，可以开始轻柔的关节活动。'; }
+    else { ids = ['rice','circles','alphabet','seated_calf']; tip = '恢复不错！可以开始轻度力量训练了。'; }
+  } else if (phase === 2) {
+    phaseName = '第二阶段：活动度恢复';
+    if (pain >= 5) { ids = ['rice','circles','alphabet']; tip = '今日疼痛偏高，退回基础训练，注意休息。'; }
+    else if (pain >= 3) { ids = ['circles','alphabet','seated_calf','towel']; tip = '可以减少冰敷，增加活动度和轻度力量训练。'; }
+    else { ids = ['circles','seated_calf','towel','balance']; tip = '恢复良好！本体感觉训练是防再次扭伤的关键。'; }
+  } else if (phase === 3) {
+    phaseName = '第三阶段：功能强化';
+    if (pain >= 4) { ids = ['circles','alphabet','seated_calf','towel']; tip = '今日有些不适，以活动度训练为主。'; }
+    else { ids = ['seated_calf','balance','band','stand_calf']; tip = '本阶段重点加强踝关节肌力，为正常步行做准备。'; }
+  } else {
+    phaseName = '第四阶段：恢复运动';
+    ids = ['balance','band','stand_calf','circles']; tip = '继续强化训练，逐步恢复正常运动强度。';
+  }
+  if (swell >= 6 && !ids.includes('rice')) ids.unshift('rice');
+  return { exercises: ids.map(id => EX[id]), phaseName, tip, phase };
+}
+
+// ── STATE ─────────────────────────────────────────────────────────────
+let currentPlan = [];
+let currentExIdx = 0;
+
+// ── TAB ───────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + tab).classList.add('active');
+  document.getElementById('nav-' + tab).classList.add('active');
+  if (tab === 'home') renderHome();
+  if (tab === 'plan') renderPlan();
+  if (tab === 'guide') renderGuide();
+  if (tab === 'log') renderLog();
+  if (tab === 'trends') renderTrends();
+}
+
+// ── HOME ──────────────────────────────────────────────────────────────
+function updatePainSlider(el) {
+  const v = +el.value;
+  el.style.setProperty('--pct', (v / 10 * 100) + '%');
+  document.getElementById('pain-pill').textContent = `当前：${v} / 10`;
+}
+
+function renderHome() {
+  const day = getDayNum(TODAY);
+  const todayE = getEntry(TODAY);
+  const prevE = state.entries[state.entries.length - (todayE ? 2 : 1)];
+
+  document.getElementById('hero-day').textContent = `Daily Assessment · Day ${day} · ${fmtDateShort(TODAY)}`;
+
+  const inputEls = ['submit-area-pain','toggle-row','notes-card','submit-area','submit-footer'];
+
+  if (todayE) {
+    document.getElementById('checkin-card').style.display = 'none';
+    inputEls.forEach(id => { const el = document.getElementById(id); if(el) el.style.display='none'; });
+    document.getElementById('checked-banner').style.display = 'flex';
+    const swellTxt = todayE.swelling ? '有肿胀' : '无肿胀';
+    const stiffTxt = todayE.stiffness ? '有僵硬感' : '无僵硬感';
+    document.getElementById('checked-desc').textContent = `疼痛 ${todayE.pain}/10 · ${swellTxt} · ${stiffTxt}`;
+    if (prevE && todayE.pain - prevE.pain >= 2) {
+      showWarn(`今天疼痛比昨天加重了 ${todayE.pain - prevE.pain} 分，建议减少活动，必要时就医。`);
+    } else if (prevE && todayE.swelling && !prevE.swelling) {
+      showWarn('今天出现肿胀，请多抬高患肢，增加冰敷频率。');
+    } else {
+      document.getElementById('warn-banner').style.display = 'none';
+    }
+  } else {
+    document.getElementById('checkin-card').style.display = '';
+    inputEls.forEach(id => { const el = document.getElementById(id); if(el) el.style.display=''; });
+    document.getElementById('checked-banner').style.display = 'none';
+    document.getElementById('warn-banner').style.display = 'none';
+    // Reset slider
+    const slider = document.getElementById('pain-slider');
+    slider.value = 5; updatePainSlider(slider);
+    document.getElementById('swell-toggle').checked = false;
+    document.getElementById('stiff-toggle').checked = true;
+    document.getElementById('notes-input').value = '';
+  }
+
+  if (prevE) {
+    const t = prevE.pain <= 3 ? '趋势向好，继续保持 💪' : '坚持就是胜利 🙏';
+    document.getElementById('hero-trend').textContent = `昨日疼痛 ${prevE.pain}/10，${t}`;
+  } else {
+    document.getElementById('hero-trend').textContent = '每日记录帮助我们动态调整你的康复训练计划，获得更好的恢复效果。';
+  }
+
+}
+
+function showWarn(msg) {
+  document.getElementById('warn-banner').style.display = 'flex';
+  document.getElementById('warn-text').textContent = msg;
+}
+
+function reEditCheckin() {
+  const inputEls = ['submit-area-pain','toggle-row','notes-card','submit-area','submit-footer'];
+  document.getElementById('checkin-card').style.display = '';
+  inputEls.forEach(id => { const el = document.getElementById(id); if(el) el.style.display=''; });
+  document.getElementById('checked-banner').style.display = 'none';
+  // Pre-fill with existing values
+  const e = getEntry(TODAY);
+  if (e) {
+    const slider = document.getElementById('pain-slider');
+    slider.value = e.pain; updatePainSlider(slider);
+    document.getElementById('swell-toggle').checked = !!e.swelling;
+    document.getElementById('stiff-toggle').checked = !!e.stiffness;
+    document.getElementById('notes-input').value = e.notes || '';
+  }
+}
+
+function submitCheckin() {
+  const pain = +document.getElementById('pain-slider').value;
+  const swelling = document.getElementById('swell-toggle').checked;
+  const stiffness = document.getElementById('stiff-toggle').checked;
+  const notes = document.getElementById('notes-input').value.trim();
+  const existing = getEntry(TODAY);
+  if (existing) { existing.pain = pain; existing.swelling = swelling; existing.stiffness = stiffness; existing.notes = notes; }
+  else state.entries.push({ date: TODAY, pain, swelling, stiffness, notes, completed: [] });
+  save();
+  renderHome();
+  setTimeout(() => switchTab('plan'), 500);
+}
+
+// ── PLAN ──────────────────────────────────────────────────────────────
+function renderPlan() {
+  const day = getDayNum(TODAY);
+  const e = getEntry(TODAY);
+  const allEntries = state.entries;
+  const prev = allEntries[allEntries.length - (e ? 2 : 1)];
+  const refPain = (e || prev || {pain:5}).pain;
+  const refSwell = (e || prev || {swelling:false}).swelling;
+
+  const { exercises, phaseName, tip, phase } = generatePlan(day, refPain, refSwell ? 6 : 2);
+  currentPlan = exercises;
+
+  // Hero
+  const completed = e ? (e.completed || []) : [];
+  const pct = exercises.length ? Math.round(completed.length / exercises.length * 100) : 0;
+  const heroAccents = ['', '需要关注', '逐步好转', '恢复良好', '非常棒'];
+  const accentColors = ['', 'var(--red)', 'var(--yellow)', 'var(--green)', 'var(--blue)'];
+  document.getElementById('plan-hero-accent').textContent = pct === 100 ? '太棒了！🎉' : heroAccents[phase];
+  document.getElementById('plan-hero-accent').style.color = pct === 100 ? 'var(--green)' : accentColors[phase];
+  document.getElementById('plan-hero-sub').textContent =
+    `第 ${day} 天 · ${phaseName}。${e ? '今日疼痛 '+e.pain+'/10。' : '今日未打卡，计划基于昨日数据。'}`;
+
+  // Status pill
+  const statusMap = [[0,'状态稳定','var(--green)'],[2,'关注调整','var(--yellow)'],[5,'需要休息','var(--red)']];
+  let statusTxt = '状态稳定', statusColor = 'var(--green)';
+  if (prev && e && e.pain - prev.pain >= 2) { statusTxt = '疼痛加重'; statusColor = 'var(--red)'; }
+  else if (refPain >= 5) { statusTxt = '轻度不适'; statusColor = 'var(--yellow)'; }
+  else if (pct === 100) { statusTxt = '今日完成'; statusColor = 'var(--blue)'; }
+  const pill = document.getElementById('plan-status-pill');
+  pill.style.background = statusColor;
+  document.getElementById('plan-status-text').textContent = statusTxt;
+
+  // Warning
+  const pw = document.getElementById('plan-warn');
+  if (!e) { pw.style.display='flex'; document.getElementById('plan-warn-text').textContent='今日还未打卡，完成打卡后计划更精准。'; }
+  else if (prev && e.pain - prev.pain >= 2) { pw.style.display='flex'; document.getElementById('plan-warn-text').textContent='今日疼痛明显加重，已为你调整为更轻柔的方案。'; }
+  else pw.style.display='none';
+
+  // Big ring
+  const C = 427.3;
+  document.getElementById('plan-big-ring').setAttribute('stroke-dashoffset', C - C * pct / 100);
+  document.getElementById('plan-ring-num').textContent = pct;
+
+  // Metric pills
+  const painReduction = allEntries.length >= 2
+    ? Math.max(0, Math.round((allEntries[0].pain - refPain) / allEntries[0].pain * 100)) : 0;
+  const flexibility = Math.min(95, 40 + day * 3 + (10 - refPain) * 2);
+  const strength = Math.min(90, 20 + day * 2 + (10 - refPain) * 3);
+  document.getElementById('plan-metric-pills').innerHTML = `
+    <div class="metric-pill">💧 灵活性：${flexibility}%</div>
+    <div class="metric-pill">💪 力量：${strength}%</div>
+    <div class="metric-pill">📉 疼痛改善：${painReduction}%</div>`;
+
+  // Progress desc
+  document.getElementById('plan-progress-desc').textContent =
+    pct === 100 ? '今日训练全部完成！你的坚持令人钦佩，继续保持。' :
+    pct >= 50 ? `你已完成今日 ${pct}% 的训练，灵活性和力量指标稳步提升，继续加油！` :
+    tip;
+
+  // Sparkline (last 7 days pain)
+  drawSparkline(allEntries.slice(-7));
+
+  // Trend
+  const recent7 = allEntries.slice(-7);
+  if (recent7.length >= 2) {
+    const first = recent7[0].pain, last = recent7[recent7.length-1].pain;
+    const diff = first - last;
+    const trendEl = document.getElementById('plan-trend-growth');
+    if (diff > 0) { trendEl.textContent = `↓ 减轻 ${diff} 分`; trendEl.style.color = 'var(--green)'; }
+    else if (diff < 0) { trendEl.textContent = `↑ 加重 ${Math.abs(diff)} 分`; trendEl.style.color = 'var(--red)'; }
+    else { trendEl.textContent = '→ 持平'; trendEl.style.color = 'var(--text-sub)'; }
+  }
+
+  // Exercise list
+  document.getElementById('exercise-list').innerHTML = exercises.map((ex, i) => {
+    const done = completed.includes(ex.id);
+    const meta = [ex.sets ? ex.sets+'组' : null, ex.reps ? '每组'+ex.reps+'次' : null, ex.duration ? ex.duration+'分钟' : null].filter(Boolean).join(' · ');
+    const metaFull = done ? meta + ' · 已完成' : meta;
+    return `
+    <div class="proto-item" onclick="openGuideEx(${i})">
+      <div class="proto-check ${done?'done':''}" onclick="toggleDone(event,'${ex.id}')">
+        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+      </div>
+      <div class="proto-info">
+        <div class="proto-name ${done?'done-text':''}">${ex.icon} ${ex.name}</div>
+        <div class="proto-meta ${done?'done-meta':''}">${metaFull}</div>
+      </div>
+      <svg width="16" height="16" viewBox="0 0 24 24" style="fill:var(--text-light);flex-shrink:0;"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
+    </div>`;
+  }).join('');
+
+  // CTA
+  if (pct === 100) {
+    document.getElementById('cta-title').textContent = '今日训练全部完成！🎉';
+    document.getElementById('cta-sub').textContent = '太棒了！明天继续保持，坚持就是胜利。';
+    document.getElementById('plan-cta').querySelector('.cta-btn').textContent = '查看明日计划';
+  } else {
+    const remaining = exercises.length - completed.length;
+    document.getElementById('cta-title').textContent = '准备好开始今日训练了吗？';
+    document.getElementById('cta-sub').textContent = `还剩 ${remaining} 个训练项目，开始你的康复训练，完成每一个动作。`;
+    document.getElementById('plan-cta').querySelector('.cta-btn').textContent = '开始训练';
+  }
+}
+
+function drawSparkline(entries) {
+  const svg = document.getElementById('plan-sparkline');
+  if (entries.length < 2) { svg.innerHTML = ''; return; }
+  const W = 320, H = 60, pad = 8;
+  const n = entries.length;
+  const pts = entries.map((e, i) => ({
+    x: pad + (i / (n-1)) * (W - pad*2),
+    y: pad + (1 - e.pain/10) * (H - pad*2)
+  }));
+  const path = pts.map((p,i) => `${i?'L':'M'}${p.x},${p.y}`).join(' ');
+  const area = path + ` L${pts[n-1].x},${H} L${pad},${H} Z`;
+  svg.innerHTML = `
+    <defs><linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#16A34A" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#16A34A" stop-opacity="0"/>
+    </linearGradient></defs>
+    <path d="${area}" fill="url(#sparkGrad)"/>
+    <path d="${path}" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    ${pts.map(p=>`<circle cx="${p.x}" cy="${p.y}" r="3" fill="var(--green)" stroke="white" stroke-width="1.5"/>`).join('')}`;
+}
+
+function startSession() {
+  currentExIdx = 0;
+  switchTab('guide');
+}
+
+function toggleDone(e, id) {
+  e.stopPropagation();
+  let entry = getEntry(TODAY);
+  if (!entry) { entry = { date: TODAY, pain: 3, swelling: false, stiffness: true, completed: [] }; state.entries.push(entry); }
+  if (!entry.completed) entry.completed = [];
+  const i = entry.completed.indexOf(id);
+  if (i === -1) entry.completed.push(id); else entry.completed.splice(i, 1);
+  save(); renderPlan();
+}
+
+function openGuideEx(idx) {
+  currentExIdx = idx; switchTab('guide');
+}
+
+// ── GUIDE ─────────────────────────────────────────────────────────────
+function renderGuide() {
+  if (!currentPlan.length) {
+    const e = getEntry(TODAY); const day = getDayNum(TODAY);
+    const { exercises } = generatePlan(day, e ? e.pain : 3, e ? e.swelling : 4);
+    currentPlan = exercises;
+  }
+  const ex = currentPlan[currentExIdx] || currentPlan[0];
+  if (!ex) return;
+  const day = getDayNum(TODAY);
+  document.getElementById('guide-day-label').textContent = '· 第 ' + day + ' 天';
+  document.getElementById('guide-name').textContent = ex.name;
+  document.getElementById('guide-desc').textContent = ex.desc;
+
+  const rings = [];
+  if (ex.sets) rings.push(mkRing(ex.sets, '组', '#2563EB', '目标 '+ex.sets+' 组'));
+  if (ex.reps) rings.push(mkRing(ex.reps, '次', '#16A34A', '每方向'));
+  else if (ex.duration) rings.push(mkRing(ex.duration, ex.duration > 5 ? '分钟' : '秒', '#16A34A', '每次时长'));
+  document.getElementById('guide-rings').innerHTML = rings.join('');
+
+  document.getElementById('guide-steps').innerHTML = ex.steps.map((s, i) => `
+    <div class="step-item ${i >= 2 ? 'pending-step' : ''}">
+      <div class="step-num ${i >= 2 ? 'pending' : 'active'}">${i+1}</div>
+      <div class="step-content"><div class="step-title">${s.title}</div><div class="step-desc">${s.desc}</div></div>
+    </div>`).join('');
+
+  const m = Math.floor((ex.timerSec||60)/60), s = (ex.timerSec||60) % 60;
+  document.getElementById('guide-timer-label').textContent = `开始计时 (${m}:${String(s).padStart(2,'0')})`;
+
+  document.getElementById('btn-prev').style.opacity = currentExIdx === 0 ? '0.4' : '1';
+  const isLast = currentExIdx >= currentPlan.length - 1;
+  document.getElementById('btn-next').textContent = isLast ? '完成 ✓' : '下一个 →';
+  document.getElementById('btn-next').style.background = isLast ? 'var(--green-light)' : 'var(--blue-light)';
+  document.getElementById('btn-next').style.color = isLast ? 'var(--green)' : 'var(--blue)';
+}
+
+function mkRing(val, unit, color, label) {
+  const r = 36, c = 2 * Math.PI * r, fill = c * 0.72;
+  return `<div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+    <svg width="90" height="90" viewBox="0 0 90 90">
+      <circle cx="45" cy="45" r="${r}" fill="none" stroke="var(--border)" stroke-width="5"/>
+      <circle cx="45" cy="45" r="${r}" fill="none" stroke="${color}" stroke-width="5"
+        stroke-dasharray="${c}" stroke-dashoffset="${c-fill}" stroke-linecap="round" transform="rotate(-90 45 45)"/>
+      <text x="45" y="42" text-anchor="middle" dominant-baseline="central" font-size="18" font-weight="800" fill="${color}">${val}</text>
+      <text x="45" y="58" text-anchor="middle" dominant-baseline="central" font-size="10" font-weight="600" fill="var(--text-sub)">${unit}</text>
+    </svg>
+    <div style="font-size:12px;color:var(--text-sub);font-weight:500;">${label}</div>
+  </div>`;
+}
+
+function prevExercise() { if (currentExIdx > 0) { currentExIdx--; renderGuide(); } }
+function nextExercise() {
+  if (currentExIdx < currentPlan.length - 1) { currentExIdx++; renderGuide(); }
+  else switchTab('plan');
+}
+function skipGuide() { nextExercise(); }
+
+// ── TIMER ─────────────────────────────────────────────────────────────
+let timerInterval, timerTotal = 60, timerLeft = 60, timerRunning = false, timerSet = 1, timerSets = 3;
+
+function openTimer() {
+  const ex = currentPlan[currentExIdx] || currentPlan[0]; if (!ex) return;
+  timerTotal = timerLeft = ex.timerSec || 60;
+  timerSets = ex.sets || 1; timerSet = 1; timerRunning = true;
+  document.getElementById('timer-ex-name').textContent = ex.name;
+  document.getElementById('timer-ex-sub').textContent = `第 ${timerSet} 组 / 共 ${timerSets} 组`;
+  document.getElementById('timer-btn-label').textContent = '暂停';
+  document.getElementById('timer-modal').classList.add('open');
+  updateTimerUI(); startInterval();
+}
+
+function startInterval() {
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    if (!timerRunning) return;
+    timerLeft--;
+    updateTimerUI();
+    if (timerLeft <= 0) {
+      clearInterval(timerInterval);
+      if (timerSet < timerSets) {
+        timerSet++; timerLeft = timerTotal; timerRunning = false;
+        document.getElementById('timer-ex-sub').textContent = `第 ${timerSet} 组 / 共 ${timerSets} 组`;
+        document.getElementById('timer-btn-label').textContent = '开始下一组';
+      } else {
+        document.getElementById('timer-btn-label').textContent = '完成 ✓';
+        document.getElementById('timer-ex-sub').textContent = '全部完成！';
+        const ex = currentPlan[currentExIdx]; if (ex) markDone(ex.id);
+      }
+    }
+  }, 1000);
+}
+
+function updateTimerUI() {
+  const m = Math.floor(timerLeft/60), s = timerLeft % 60;
+  document.getElementById('timer-display').textContent = `${m}:${String(s).padStart(2,'0')}`;
+  document.getElementById('timer-ring').setAttribute('stroke-dashoffset', 502.7 * (1 - timerLeft/timerTotal));
+}
+
+function markDone(id) {
+  let e = getEntry(TODAY);
+  if (!e) { e = {date:TODAY,pain:3,swelling:4,completed:[]}; state.entries.push(e); }
+  if (!e.completed) e.completed = [];
+  if (!e.completed.includes(id)) { e.completed.push(id); save(); }
+}
+
+function toggleTimer() {
+  if (timerLeft <= 0) { if (timerSet <= timerSets) { timerRunning=true; document.getElementById('timer-btn-label').textContent='暂停'; startInterval(); } else closeTimer(); return; }
+  timerRunning = !timerRunning;
+  document.getElementById('timer-btn-label').textContent = timerRunning ? '暂停' : '继续';
+  if (timerRunning) startInterval();
+}
+function closeTimer() { clearInterval(timerInterval); timerRunning=false; document.getElementById('timer-modal').classList.remove('open'); }
+function closeTimerOutside(e) { if (e.target === document.getElementById('timer-modal')) closeTimer(); }
+
+// ── LOG ───────────────────────────────────────────────────────────────
+// ── LOG state ─────────────────────────────────────────────────────────
+let logViewYear = new Date(TODAY).getFullYear();
+let logViewMonth = new Date(TODAY).getMonth();
+let logSelectedDate = TODAY;
+
+function shiftMonth(dir) {
+  logViewMonth += dir;
+  if (logViewMonth > 11) { logViewMonth = 0; logViewYear++; }
+  if (logViewMonth < 0)  { logViewMonth = 11; logViewYear--; }
+  renderLog();
+}
+
+function selectCalDay(ds) {
+  logSelectedDate = ds;
+  renderLog();
+}
+
+function renderLog() {
+  document.getElementById('log-month-title').textContent = `${EN_MONTHS_FULL[logViewMonth]} ${logViewYear}`;
+
+  // Day labels Mon–Sun
+  document.getElementById('cal-labels').innerHTML =
+    ['一','二','三','四','五','六','日'].map(l => `<div class="cal-day-label">${l}</div>`).join('');
+
+  // Grid (week starts Monday)
+  const firstWeekday = (new Date(logViewYear, logViewMonth, 1).getDay() + 6) % 7;
+  const daysInMonth = new Date(logViewYear, logViewMonth + 1, 0).getDate();
+  let html = '<div class="cal-day empty"></div>'.repeat(firstWeekday);
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const ds = `${logViewYear}-${String(logViewMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const entry = getEntry(ds);
+    const isToday = ds === TODAY;
+    const isFuture = ds > TODAY;
+    const isSelected = ds === logSelectedDate;
+
+    let cls = 'cal-day';
+    if (isFuture)      cls += ' future';
+    else if (isToday)  cls += ' today' + (entry ? ' has-entry' : '');
+    else if (entry)    cls += ' has-entry ' + (entry.pain <= 3 ? 'pain-low' : entry.pain <= 6 ? 'pain-mid' : 'pain-high');
+    else               cls += ' no-data';
+    if (isSelected && !isToday) cls += ' selected';
+
+    html += `<div class="${cls}" onclick="selectCalDay('${ds}')">${d}</div>`;
+  }
+  document.getElementById('cal-grid').innerHTML = html;
+  renderActivityOverview(logSelectedDate);
+}
+
+function renderActivityOverview(dateStr) {
+  const entry = getEntry(dateStr);
+  const dt = new Date(dateStr);
+  const isToday = dateStr === TODAY;
+
+  document.getElementById('ao-date-label').textContent = isToday
+    ? `Today, ${EN_MONTHS[dt.getMonth()]} ${dt.getDate()}`
+    : `${EN_WDAYS[dt.getDay()]}, ${EN_MONTHS[dt.getMonth()]} ${dt.getDate()} · Day ${getDayNum(dateStr)}`;
+
+  // Pain summary
+  const painEl = document.getElementById('ao-pain-card');
+  if (entry) {
+    painEl.innerHTML = `
+      <div class="pain-summary-card">
+        <div class="pain-summary-item">
+          <div class="pain-summary-num" style="color:var(--red)">${entry.pain}<sup style="font-size:12px;color:var(--text-sub)">/10</sup></div>
+          <div class="pain-summary-lbl">疼痛</div>
+        </div>
+        <div class="pain-summary-divider"></div>
+        <div class="pain-summary-item">
+          <div class="pain-summary-num" style="color:var(--blue);font-size:20px;">${typeof entry.swelling==='boolean'?(entry.swelling?'有':'无'):(entry.swelling||'—')}</div>
+          <div class="pain-summary-lbl">肿胀</div>
+        </div>
+        <div class="pain-summary-divider"></div>
+        <div class="pain-summary-item">
+          <div class="pain-summary-num" style="color:var(--green);font-size:20px;">${entry.stiffness!==undefined?(entry.stiffness?'有':'无'):'—'}</div>
+          <div class="pain-summary-lbl">僵硬感</div>
+        </div>
+      </div>
+      ${entry.notes ? `<div style="margin:0 16px 12px;padding:12px 16px;background:white;border-radius:14px;font-size:13px;color:var(--text-sub);line-height:1.6;box-shadow:0 1px 4px rgba(0,0,0,0.05);">"${entry.notes}"</div>` : ''}`;
+  } else {
+    painEl.innerHTML = '';
+  }
+
+  // Exercises
+  const itemsEl = document.getElementById('ao-items');
+  if (dateStr > TODAY) {
+    itemsEl.innerHTML = `<div class="ao-empty"><div class="ao-empty-icon">📅</div><div class="ao-empty-text">未来日期，暂无记录</div></div>`;
+    return;
+  }
+  if (!entry) {
+    itemsEl.innerHTML = `<div class="ao-empty"><div class="ao-empty-icon">📝</div><div class="ao-empty-text">该日暂无打卡记录</div></div>`;
+    return;
+  }
+
+  const dayNum = getDayNum(dateStr);
+  const swellNum = typeof entry.swelling === 'boolean' ? (entry.swelling ? 6 : 1) : (entry.swelling || 1);
+  const { exercises } = generatePlan(dayNum, entry.pain, swellNum);
+  const completed = entry.completed || [];
+
+  itemsEl.innerHTML = exercises.map((ex, i) => {
+    const done = completed.includes(ex.id);
+    const meta = [ex.sets?ex.sets+'组':null, ex.reps?'每组'+ex.reps+'次':null, ex.duration?ex.duration+'分钟':null].filter(Boolean).join(' · ');
+    return `
+    <div class="ao-item ${done?'':'incomplete'}">
+      <div class="ao-item-icon ${done?'done-icon':'todo-icon'}">${ex.icon}</div>
+      <div class="ao-item-info">
+        <div class="ao-item-name ${done?'':'todo-name'}">${ex.name}</div>
+        <div class="ao-item-sub ${done?'done-sub':''}">${done ? '已完成 · '+meta : meta}</div>
+      </div>
+      ${done
+        ? `<div class="ao-check-done"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg></div>`
+        : `<div class="ao-check-empty"></div>`}
+    </div>`;
+  }).join('');
+}
+
+// ── TRENDS ────────────────────────────────────────────────────────────
+function renderTrends() {
+  const day = getDayNum(TODAY);
+  const e = getEntry(TODAY);
+  const refPain = (e || state.entries[state.entries.length-1] || {pain:5}).pain;
+  const phase = getPhase(day, refPain);
+
+  // Estimate total duration & finish date
+  const avgPainDrop = state.entries.length >= 2
+    ? (state.entries[0].pain - refPain) / Math.max(1, state.entries.length - 1) : 0.5;
+  const daysToZeroPain = avgPainDrop > 0 ? Math.ceil(refPain / avgPainDrop) : 21;
+  const totalDays = Math.max(28, day + daysToZeroPain + 7);
+  const finishDate = new Date(state.startDate);
+  finishDate.setDate(finishDate.getDate() + totalDays - 1);
+  document.getElementById('trends-duration').textContent = totalDays;
+  document.getElementById('trends-finish-date').textContent = `${EN_MONTHS[finishDate.getMonth()]} ${finishDate.getDate()}`;
+
+  // Phase timeline data
+  const PHASES = [
+    { title:'活动度与消炎', desc:'通过低强度引导动作改善关节活动范围，减少炎症和肿胀。', weeks:'Days 1–7', range:[1,7] },
+    { title:'等长力量训练', desc:'过渡到负重练习，重建肌腱韧性和肌肉激活能力，恢复踝关节稳定性。', weeks:'Days 8–14', range:[8,14] },
+    { title:'平衡与功能强化', desc:'动态稳定性训练，恢复本体感觉，为日常活动和运动做准备。', weeks:'Days 15–21', range:[15,21] },
+    { title:'恢复运动', desc:'逐步恢复跑步、跳跃等运动专项动作，完全回归正常生活。', weeks:'Day 22+', range:[22,99] },
+  ];
+
+  const timelineEl = document.getElementById('phase-timeline');
+  timelineEl.innerHTML = `<div class="phases-outer"><div class="phases-vline"></div>` +
+    PHASES.map((p, i) => {
+      const ph = i + 1;
+      const done = day > p.range[1];
+      const cur  = day >= p.range[0] && day <= p.range[1];
+      const locked = day < p.range[0];
+      const weekPct = done ? 100 : cur
+        ? Math.min(99, Math.round((day - p.range[0]) / (p.range[1] - p.range[0] + 1) * 100)) : 0;
+
+      const iconHtml = done
+        ? `<svg viewBox="0 0 24 24" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>`
+        : cur
+        ? `<svg viewBox="0 0 24 24" fill="white"><path d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.6 13.9l1-4.4 2.1 2v6h2v-7.5l-2.1-2 .6-3c1.3 1.5 3.3 2.5 5.5 2.5v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1l-5.2 2.2v4.7h2v-3.4l1.8-.7-1.6 8.1-4.9-1-.4 2 7 1.4z"/></svg>`
+        : `<svg viewBox="0 0 24 24" fill="#94A3B8"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>`;
+
+      const statusTxt = done ? 'COMPLETED' : cur ? 'CURRENT' : 'LOCKED';
+      const statusCls = done ? 'done' : cur ? 'current' : 'locked';
+
+      return `
+      <div class="phase-row">
+        <div class="timeline-icon ${statusCls}">${iconHtml}</div>
+        <div class="timeline-card ${locked ? 'locked-card' : ''}">
+          <div class="phase-card-top">
+            <span class="phase-status-badge ${statusCls}">PHASE ${ph}: ${statusTxt}</span>
+            <span class="phase-weeks">${p.weeks}</span>
+          </div>
+          <div class="phase-card-title ${locked ? 'locked-text' : ''}">${p.title}</div>
+          <div class="phase-card-desc">${p.desc}</div>
+          ${done ? `<div class="phase-milestone">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.41L6.41 12.83l1.41-1.42L10 13.58l6.17-6.17 1.42 1.41L10 16.41z"/></svg>
+            100% Milestone Achieved</div>` : ''}
+          ${cur ? `
+            <div class="phase-weekly-progress">
+              <div class="phase-wp-row"><span class="phase-wp-label">Weekly Progress</span><span class="phase-wp-pct">${weekPct}%</span></div>
+              <div class="phase-wp-bar"><div class="phase-wp-fill" style="width:${weekPct}%"></div></div>
+            </div>
+            <button class="phase-continue-btn" onclick="switchTab('guide')">Continue Exercises</button>` : ''}
+        </div>
+      </div>`;
+    }).join('') + `</div>`;
+
+  // Activity recommendations per phase
+  const ALL_ACTIVITIES = {
+    1: [
+      { icon:'🏊', name:'水中步行', desc:'水中减重，关节无压力，轻松维持血液循环', badge:'推荐', badgeCls:'badge-green' },
+      { icon:'🪑', name:'坐姿练习', desc:'坐姿踝关节活动、画圆、字母描写等', badge:'推荐', badgeCls:'badge-green' },
+      { icon:'🧘', name:'上肢瑜伽', desc:'保持上半身灵活性，避免全身失调', badge:'适合', badgeCls:'badge-blue' },
+      { icon:'🚲', name:'固定单车', desc:'低阻力，无踝关节冲击，可轻度尝试', badge:'谨慎', badgeCls:'badge-yellow' },
+    ],
+    2: [
+      { icon:'🚶', name:'平地慢走', desc:'短距离步行，约 10-15 分钟，平稳地面', badge:'推荐', badgeCls:'badge-green' },
+      { icon:'🚲', name:'固定单车', desc:'中等阻力，增强小腿肌肉力量', badge:'推荐', badgeCls:'badge-green' },
+      { icon:'🏊', name:'游泳', desc:'自由泳或仰泳，避免蛙泳踢腿', badge:'推荐', badgeCls:'badge-green' },
+      { icon:'🧘', name:'平衡瑜伽', desc:'单腿平衡体式，增强踝关节稳定性', badge:'适合', badgeCls:'badge-blue' },
+    ],
+    3: [
+      { icon:'🏃', name:'快走 / 慢跑', desc:'平地慢跑 10-15 分钟，注意踏地感受', badge:'推荐', badgeCls:'badge-green' },
+      { icon:'⛰️', name:'平路徒步', desc:'避免陡坡，穿好踝关节支撑鞋', badge:'推荐', badgeCls:'badge-green' },
+      { icon:'🏊', name:'游泳', desc:'全泳姿均可，踝关节发力已更稳定', badge:'推荐', badgeCls:'badge-green' },
+      { icon:'⛹️', name:'轻度球类', desc:'投篮、轻接传球等，避免急停急转', badge:'谨慎', badgeCls:'badge-yellow' },
+    ],
+    4: [
+      { icon:'🏃', name:'跑步', desc:'已可恢复正常跑步，注意热身', badge:'推荐', badgeCls:'badge-green' },
+      { icon:'⚽', name:'球类运动', desc:'足球、篮球等，建议佩戴护踝', badge:'推荐', badgeCls:'badge-green' },
+      { icon:'🏔️', name:'登山越野', desc:'各类地形均可，建议使用登山杖', badge:'推荐', badgeCls:'badge-green' },
+      { icon:'🤸', name:'全部运动', desc:'踝关节已恢复，可循序渐进恢复所有运动', badge:'推荐', badgeCls:'badge-green' },
+    ],
+  };
+  const recs = ALL_ACTIVITIES[phase] || ALL_ACTIVITIES[2];
+  document.getElementById('activity-recs').innerHTML = recs.map(a => `
+    <div class="activity-item">
+      <div class="activity-icon">${a.icon}</div>
+      <div class="activity-info">
+        <div class="activity-name">${a.name}</div>
+        <div class="activity-desc">${a.desc}</div>
+      </div>
+      <span class="activity-badge badge ${a.badgeCls}">${a.badge}</span>
+    </div>`).join('');
+
+  // Sports recovery prediction
+  const SPORTS = [
+    { icon:'🚶', name:'平地慢走',   baseDays: 7  },
+    { icon:'🚲', name:'骑行',       baseDays: 10 },
+    { icon:'🏊', name:'游泳',       baseDays: 8  },
+    { icon:'🧘', name:'瑜伽',       baseDays: 14 },
+    { icon:'🏃', name:'慢跑',       baseDays: 21 },
+    { icon:'⛰️', name:'登山',       baseDays: 24 },
+    { icon:'🎾', name:'网球',       baseDays: 35 },
+    { icon:'⛹️', name:'篮球',       baseDays: 42 },
+    { icon:'⚽', name:'足球',       baseDays: 45 },
+    { icon:'🤸', name:'体操/跳绳',  baseDays: 50 },
+  ];
+  // Adjust based on current pain: higher pain = more days
+  const painFactor = refPain / 5;
+  const maxDays = Math.max(...SPORTS.map(s => s.baseDays));
+  document.getElementById('sports-prediction').innerHTML = `<div style="background:#F8FAFC;border-radius:16px;padding:16px;">` +
+    SPORTS.map(s => {
+      const predicted = Math.max(1, Math.ceil(s.baseDays * (0.7 + painFactor * 0.6)) - day + 1);
+      const alreadyOk = predicted <= 0 || day >= s.baseDays * 0.8;
+      const displayDays = alreadyOk ? '可以了' : `${predicted} 天`;
+      const barPct = Math.min(100, (day / (s.baseDays * (0.7 + painFactor * 0.6))) * 100);
+      const barColor = barPct >= 100 ? 'var(--green)' : barPct >= 50 ? 'var(--blue)' : 'var(--text-light)';
+      return `
+      <div class="sport-row">
+        <span class="sport-icon">${s.icon}</span>
+        <span class="sport-name">${s.name}</span>
+        <div class="sport-bar-wrap"><div class="sport-bar-fill" style="width:${barPct}%;background:${barColor}"></div></div>
+        <div class="sport-days">
+          <div class="sport-days-num" style="color:${barPct>=100?'var(--green)':'var(--text)'}">${displayDays}</div>
+          ${barPct < 100 ? '<div class="sport-days-lbl">后可恢复</div>' : ''}
+        </div>
+      </div>`;
+    }).join('') + `</div>`;
+
+  // Motivation
+  const motivations = [
+    '保持耐心，每一天的坚持都在为无痛生活打下基础。',
+    '疼痛减少是进步的信号，但彻底康复需要全程坚持。',
+    '今天的训练是明天奔跑的基础。别急，节奏稳才走得远。',
+    '康复是一场马拉松，而不是短跑。你做得很好！',
+  ];
+  document.getElementById('trends-motivation').textContent = motivations[phase - 1] || motivations[0];
+}
+
+function drawChart(entries) {
+  const svg = document.getElementById('trend-chart');
+  const W=360, H=180, T=20, R=14, B=30, L=28, iW=W-L-R, iH=H-T-B;
+  if (entries.length < 2) { svg.innerHTML = '<text x="50%" y="50%" text-anchor="middle" fill="#94A3B8" font-size="14">数据不足</text>'; return; }
+  const n = entries.length;
+  const pts = entries.map((e,i) => ({ x: L + (i/(n-1))*iW, py: T+(1-e.pain/10)*iH, sy: T+(1-e.swelling/10)*iH }));
+  let grid = '';
+  for (let v=0; v<=10; v+=2) {
+    const y = T+(1-v/10)*iH;
+    grid += `<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="#E2E8F0" stroke-width="1"/>`;
+    grid += `<text x="${L-4}" y="${y}" text-anchor="end" dominant-baseline="central" font-size="9" fill="#94A3B8">${v}</text>`;
+  }
+  let xlabels = '';
+  entries.forEach((e,i) => {
+    if (i % Math.max(1, Math.floor(n/5)) === 0 || i === n-1) {
+      const d = new Date(e.date);
+      xlabels += `<text x="${L+(i/(n-1))*iW}" y="${H-5}" text-anchor="middle" font-size="9" fill="#94A3B8">${d.getMonth()+1}/${d.getDate()}</text>`;
+    }
+  });
+  const pPath = pts.map((p,i) => `${i?'L':'M'}${p.x},${p.py}`).join(' ');
+  const sPath = pts.map((p,i) => `${i?'L':'M'}${p.x},${p.sy}`).join(' ');
+  const pArea = pPath + ` L${pts[n-1].x},${T+iH} L${L},${T+iH} Z`;
+  const sArea = sPath + ` L${pts[n-1].x},${T+iH} L${L},${T+iH} Z`;
+  svg.innerHTML = `<defs>
+    <linearGradient id="pG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#DC2626" stop-opacity="0.15"/><stop offset="100%" stop-color="#DC2626" stop-opacity="0.01"/></linearGradient>
+    <linearGradient id="sG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2563EB" stop-opacity="0.12"/><stop offset="100%" stop-color="#2563EB" stop-opacity="0.01"/></linearGradient>
+  </defs>
+  ${grid}${xlabels}
+  <path d="${sArea}" fill="url(#sG)"/>
+  <path d="${pArea}" fill="url(#pG)"/>
+  <path d="${sPath}" fill="none" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="${pPath}" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  ${pts.map(p=>`<circle cx="${p.x}" cy="${p.py}" r="3" fill="#DC2626" stroke="white" stroke-width="1.5"/>`).join('')}
+  ${pts.map(p=>`<circle cx="${p.x}" cy="${p.sy}" r="3" fill="#2563EB" stroke="white" stroke-width="1.5"/>`).join('')}`;
+}
+
+// ── UTILS ─────────────────────────────────────────────────────────────
+const EN_MONTHS = ['Jan.','Feb.','Mar.','Apr.','May','Jun.','Jul.','Aug.','Sep.','Oct.','Nov.','Dec.'];
+const EN_MONTHS_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const EN_WDAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+function fmtDate(d) {
+  const dt = new Date(d);
+  return `${EN_MONTHS[dt.getMonth()]} ${dt.getDate()}, ${dt.getFullYear()}`;
+}
+function fmtDateShort(d) {
+  const dt = new Date(d);
+  return `${EN_MONTHS[dt.getMonth()]} ${dt.getDate()}`;
+}
+function showPhaseInfo() {
+  const day = getDayNum(TODAY), e = getEntry(TODAY), phase = getPhase(day, e ? e.pain : 5);
+  const info = ['','急性期（第1-7天）\n目标：控制疼痛与肿胀\n主要：RICE + 轻柔关节活动\n避免：负重、剧烈活动','活动度恢复期（第8-14天）\n目标：恢复正常活动范围\n主要：关节活动度练习、轻度力量训练\n开始：本体感觉训练','功能强化期（第15-21天）\n目标：全面恢复肌力和稳定性\n主要：弹力带抗阻、平衡、提踵训练','恢复运动期（第22天+）\n目标：安全恢复运动能力\n主要：动态平衡、功能性动作'];
+  alert(info[phase]);
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────
+renderHome();
+
+// ── PWA SERVICE WORKER ─────────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('SW registered, scope:', reg.scope))
+      .catch(err => console.warn('SW registration failed:', err));
+  });
+}
+</script>
+</body>
+</html>
