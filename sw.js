@@ -1,4 +1,4 @@
-const CACHE = 'ankle-rehab-v1';
+const CACHE = 'ankle-rehab-v2';
 const ASSETS = [
   './',
   './index.html',
